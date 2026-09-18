@@ -1,0 +1,39 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Buyurtma #{{ order.id }}{% endblock %}
+{% block heading %}Buyurtma #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="detail-layout">
+    <section class="panel-card">
+        <div class="panel-heading"><div><p class="eyebrow">Buyurtma tafsilotlari</p><h2>{{ order.user.username }}</h2></div><span class="status status-{{ order.status }}">{{ order.get_status_display }}</span></div>
+        <div class="detail-facts">
+            <div><span>Telefon</span><strong>{{ order.phone }}</strong></div>
+            <div><span>Yetkazib berish manzili</span><strong>{{ order.address }}</strong></div>
+            <div><span>Yaratilgan vaqt</span><strong>{{ order.created_at|date:'d.m.Y H:i' }}</strong></div>
+            <div><span>To‘lov holati</span><strong>{% if order.is_paid %}To‘langan{% else %}To‘lanmagan{% endif %}</strong></div>
+        </div>
+        <div class="order-items">
+            {% for item in order.items.all %}
+                <div class="order-item"><span>{{ item.product.title }}</span><span>{{ item.quantity }} × ${{ item.price|floatformat:2 }}</span><strong>${{ item.price|floatformat:2 }}</strong></div>
+            {% endfor %}
+            <div class="order-total"><span>Jami</span><strong>${{ order.total_price|floatformat:2 }}</strong></div>
+        </div>
+    </section>
+    <aside class="panel-card action-card">
+        <p class="eyebrow">Admin amali</p>
+        <h2>Statusni boshqarish</h2>
+        {% if order.status == 'pending' %}
+            <p class="muted-text">Tasdiqlashda foydalanuvchi balansidan buyurtma summasi yechiladi.</p>
+            <form method="post" action="{% url 'dashboard:order_status' order.id %}">
+                {% csrf_token %}
+                <button class="action-button approve" name="action" value="approve" type="submit">Buyurtmani tasdiqlash</button>
+                <button class="action-button reject" name="action" value="reject" type="submit">Buyurtmani rad etish</button>
+            </form>
+        {% else %}
+            <p class="muted-text">Bu buyurtma bo‘yicha qaror qabul qilingan.</p>
+        {% endif %}
+        <a class="back-link" href="{% url 'dashboard:orders' %}">← Buyurtmalar ro‘yxatiga qaytish</a>
+    </aside>
+</div>
+{% endblock %}

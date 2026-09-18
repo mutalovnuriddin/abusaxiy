@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+
+
+{% block content %}
+
+<!-- Page Content -->
+<!-- Banner Starts Here -->
+<div class="banner header-text">
+  <div class="owl-banner owl-carousel">
+
+    {% for banner in banners %}
+    <!-- Inline style orqali Django mediamillatidagi rasm yo'li beriladi -->
+    <div class="banner-item" style="background-image: url('{{ banner.image }}');">
+      <div class="text-content">
+        <h4>{{ banner.subtitle }}</h4>
+        <h2>{{ banner.title }}</h2>
+      </div>
+    </div>
+    {% empty %}
+    <!-- Agar admin paneldan hali banner qo'shilmagan bo'lsa zaxira (default) rasm -->
+    <div class="banner-item" style="background-image: url('/static/images/slide_01.jpg');">
+      <div class="text-content">
+        <h4>{% trans "Maxsus takliflar" %}</h4>
+        <h2>{% trans "Xush kelibsiz!" %}</h2>
+      </div>
+    </div>
+    {% endfor %}
+
+  </div>
+</div>
+<!-- Banner Ends Here -->
+
+<div class="latest-products">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="section-heading">
+          <h2>{% trans "Yangi mahsulotlar" %}</h2>
+          <a href="{% url 'product' %}">{% trans "barcha mahsulotlarni ko'rish" %} <i class="fa fa-angle-right"></i></a>
+        </div>
+      </div>
+      {% for product in products %}
+      <div class="col-md-4 mb-4">
+        <div class="product-item">
+          <!-- Rasmga link beramiz -->
+          <a href="{% url 'product_detail' product.id %}" class="product-img-holder">
+            <img src="{{ product.img }}"
+              alt="{{ product.title }}">
+          </a>
+
+          <!-- Matn va ma'lumotlar bloki -->
+          <div class="down-content">
+            <!-- Sarlavhaga link beramiz -->
+            <a href="{% url 'product_detail' product.id %}">
+              <h4>{{ product.title }}</h4>
+            </a>
+            <h6>${{ product.price }}</h6>
+
+            <p class="product-description">{{ product.description }}</p>
+
+            <!-- Yulduzcha va sharhlar -->
+            <div class="product-bottom-info product-rating-row">
+              <span class="rating-stars" style="--rating: {{ product.avg_rating|default:0 }};" aria-label="{{ product.avg_rating|default:0|floatformat:1 }} / 5">★★★★★</span>
+              <span>{% trans "Sharhlar" %} ({{ product.views_count }})</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="best-features">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="section-heading">
+          <h2>{% trans "Biz haqimizda" %}</h2>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="left-content">
+          <h4>{% trans "Eng yaxshi mahsulotlarni qidiryapsizmi?" %}</h4>
+          <p>{% trans "Ushbu shablon biznes veb-saytlaringiz uchun bepul ishlatilishi mumkin." %}</p>
+          <ul class="featured-list">
+            <li><a href="#">{% trans "Sifatli mahsulotlar" %}</a></li>
+            <li><a href="#">{% trans "Tezkor yetkazib berish" %}</a></li>
+            <li><a href="#">{% trans "Qulay narxlar" %}</a></li>
+            <li><a href="#">{% trans "24/7 qo'llab-quvvatlash" %}</a></li>
+            <li><a href="#">{% trans "Kafolat beriladi" %}</a></li>
+          </ul>
+          <a href="{% url 'about' %}" class="filled-button">{% trans "Batafsil" %}</a>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="right-image">
+          <img src="{% static 'images/feature-image.jpg' %}" alt="">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="call-to-action">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="inner-content">
+          <div class="row">
+            <div class="col-md-8">
+              <h4>{% trans "Ijodiy va noyob" %} <em>Sixteen</em> {% trans "Mahsulotlar" %}</h4>
+              <p>{% trans "Bugun buyurtma bering va eng yaxshi mahsulotlarga ega bo'ling!" %}
+              </p>
+            </div>
+            <div class="col-md-4">
+              <a href="#" class="filled-button">{% trans "Hozir sotib olish" %}</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

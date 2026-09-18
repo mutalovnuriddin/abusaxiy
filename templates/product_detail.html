@@ -1,0 +1,322 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<style>
+  .product-detail-section {
+    padding: 60px 0;
+    background-color: #fff;
+  }
+
+  .detail-img-box {
+    width: 100%;
+    max-height: 450px;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #f8f9fa;
+    border: 1px solid #eee;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  }
+
+  .detail-img-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .product-info-box {
+    padding: 10px 20px;
+  }
+
+  .product-title-main {
+    font-size: 32px;
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 15px;
+  }
+
+  .product-price-main {
+    font-size: 28px;
+    font-weight: 700;
+    color: #f33f3f;
+    margin-bottom: 20px;
+  }
+
+  .rating-review-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .rating-review-box .stars {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 4px;
+    color: #f33f3f;
+  }
+
+  .review-count {
+    color: #6c757d;
+    font-size: 14px;
+  }
+
+  .product-full-desc {
+    font-size: 16px;
+    color: #4a5568;
+    line-height: 1.7;
+    margin-bottom: 30px;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    padding: 20px 0;
+  }
+
+  .btn-buy-primary {
+    background-color: #f33f3f;
+    color: #ffffff;
+    padding: 14px 32px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 5px;
+    border: 2px solid #f33f3f;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+  .btn-buy-primary:hover {
+    background-color: #ffffff;
+    color: #f33f3f;
+  }
+
+  .btn-outline-back {
+    background-color: #ffffff;
+    color: #333;
+    padding: 14px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .btn-outline-back:hover {
+    background-color: #f8f9fa;
+    color: #f33f3f;
+  }
+
+  .rating-stars {
+    position: relative;
+    display: inline-block;
+    color: #ddd;
+    letter-spacing: 3px;
+  }
+
+  .rating-stars::after {
+    content: '\2605\2605\2605\2605\2605';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: calc(var(--rating, 0) / 5 * 100%);
+    overflow: hidden;
+    color: #f33f3f;
+    white-space: nowrap;
+  }
+
+  .review-section {
+    margin-top: 55px;
+    padding-top: 35px;
+    border-top: 1px solid #eee;
+  }
+
+  .review-form-box,
+  .review-card {
+    padding: 24px;
+    margin-bottom: 20px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, .04);
+  }
+
+  .review-form-box h3,
+  .review-section h2 {
+    margin-bottom: 20px;
+    color: #212529;
+  }
+
+  .review-choice {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    gap: 4px;
+  }
+
+  .review-choice input {
+    position: absolute;
+    opacity: 0;
+  }
+
+  .review-choice label {
+    color: #ddd;
+    cursor: pointer;
+    font-size: 25px;
+  }
+
+  .review-choice label:hover,
+  .review-choice label:hover ~ label,
+  .review-choice input:checked ~ label {
+    color: #f33f3f;
+  }
+
+  .review-comment {
+    width: 100%;
+    min-height: 100px;
+    margin: 15px 0;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    resize: vertical;
+  }
+
+  .review-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 10px;
+  }
+
+  .review-meta strong {
+    color: #212529;
+  }
+
+  .review-date {
+    color: #888;
+    font-size: 13px;
+  }
+
+  .review-card p {
+    color: #4a4a4a;
+    white-space: pre-line;
+  }
+
+  .like-button {
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #fff;
+    color: #666;
+    cursor: pointer;
+  }
+
+  .like-button:hover,
+  .like-button.liked {
+    border-color: #f33f3f;
+    color: #f33f3f;
+  }
+
+  .review-alert {
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    background: #edf8ef;
+    color: #26733a;
+  }
+</style>
+
+<div class="product-detail-section">
+  <div class="container">
+
+    <!-- Orqaga qaytish havolasi -->
+    <div class="mb-4" style="margin-top: 80px; padding-bottom: 40px;">
+      <a href="{% url 'product' %}" class="btn-outline-back">
+        <i class="fa fa-arrow-left"></i> {% trans "Barcha mahsulotlarga qaytish" %}
+      </a>
+    </div>
+
+    <div class="row align-items-center">
+      <!-- Chap taraf: Mahsulot rasmi -->
+      <div class="col-md-6 mb-4 mb-md-0">
+        <div class="detail-img-box">
+          <img src="{{ product.img }}" alt="{{ product.title }}">
+        </div>
+      </div>
+
+      <!-- O'ng taraf: Mahsulot batafsil ma'lumotlari -->
+      <div class="col-md-6">
+        <div class="product-info-box">
+          <h1 class="product-title-main">{{ product.title }}</h1>
+
+          <div class="rating-review-box">
+            <span class="rating-stars" style="--rating: {{ average_rating|floatformat:1 }};">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+            <span class="review-count">{% trans "Sharhlar" %} ({{ product.views_count }}) &middot; {{ average_rating|floatformat:1 }}/5 ({{ review_count }} {% trans "baho" %})</span>
+          </div>
+
+          <div class="product-price-main">${{ product.price }}</div>
+
+          <div class="product-full-desc">
+            {{ product.description }}
+          </div>
+
+          <div class="d-flex gap-3">
+            <a href="{% url 'add_to_cart' product.id %}" class="btn-buy-primary">
+              <i class="fa fa-shopping-cart"></i> {% trans "Savatchaga qo'shish" %}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="review-section" id="reviews">
+      {% if can_review %}
+      <div class="review-form-box">
+        <h3>{% if user_review %}{% trans "Sharhingizni yangilang" %}{% else %}{% trans "Mahsulotni baholang" %}{% endif %}</h3>
+        <p>{% trans "1 dan 5 gacha yulduz tanlang. Izoh yozish majburiy emas." %}</p>
+        <form method="post" action="{% url 'submit_review' product.id %}">
+          {% csrf_token %}
+          <div class="review-choice" aria-label="{% trans 'Mahsulot bahosi' %}">
+            {% for value in '54321' %}
+            <input type="radio" id="rating{{ value }}" name="rating" value="{{ value }}" {% if user_review and user_review.rating|stringformat:'s' == value %}checked{% endif %} required>
+            <label for="rating{{ value }}" title="{{ value }} {% trans 'yulduz' %}">&#9733;</label>
+            {% endfor %}
+          </div>
+          <textarea class="review-comment" name="comment" placeholder="{% trans 'Mahsulot haqidagi fikringiz (ixtiyoriy)' %}">{{ user_review.comment|default:'' }}</textarea>
+          <button type="submit" class="btn-buy-primary"><i class="fa fa-paper-plane"></i> {% trans "Sharhni yuborish" %}</button>
+        </form>
+      </div>
+      {% endif %}
+
+      <h2>{% trans "Foydalanuvchilar sharhlari" %}</h2>
+      {% for review in reviews %}
+      <article class="review-card">
+        <div class="review-meta">
+          <div><strong>{{ review.user.username }}</strong> <span class="review-date">{{ review.created_at|date:'d.m.Y H:i' }}</span></div>
+          <span class="rating-stars" style="--rating: {{ review.rating }};">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+        </div>
+        {% if review.comment %}<p>{{ review.comment }}</p>{% endif %}
+        {% if user.is_authenticated %}
+        <form method="post" action="{% url 'toggle_review_like' review.id %}">
+          {% csrf_token %}
+          <button type="submit" class="like-button {% if review.id in liked_review_ids %}liked{% endif %}">
+            <i class="fa fa-thumbs-up"></i> {{ review.like_count }}
+          </button>
+        </form>
+        {% else %}
+        <span class="review-date"><i class="fa fa-thumbs-up"></i> {{ review.like_count }}</span>
+        {% endif %}
+      </article>
+      {% empty %}
+      <p>{% trans "Hali sharhlar mavjud emas. Birinchi bo'lib fikr bildiring." %}</p>
+      {% endfor %}
+    </div>
+
+  </div>
+</div>
+
+
+{% endblock %}

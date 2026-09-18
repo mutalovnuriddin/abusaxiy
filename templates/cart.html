@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load i18n %}
+
+<style>
+  .cart-wrapper {
+    background-color: #f4f5f7;
+    padding: 100px 0 60px 0;
+    min-height: 85vh;
+  }
+
+  .cart-box {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    margin-bottom: 20px;
+  }
+
+  .cart-item-img {
+    width: 90px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+
+  .quantity-control {
+    display: flex;
+    align-items: center;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+    width: fit-content;
+  }
+
+  .btn-qty {
+    background: #fff;
+    border: none;
+    padding: 5px 12px;
+    font-weight: bold;
+    color: #4a5568;
+    text-decoration: none !important;
+  }
+
+  .btn-qty:hover {
+    background: #edf2f7;
+  }
+
+  .qty-number {
+    padding: 5px 12px;
+    font-weight: 600;
+  }
+
+  .product-recommend-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    height: 100%;
+    transition: transform 0.2s;
+  }
+
+  .product-recommend-card:hover {
+    transform: translateY(-3px);
+  }
+
+  .recommend-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+</style>
+
+<div class="cart-wrapper">
+  <div class="container">
+
+    {% if cart_items %}
+    <h3 class="fw-bold mb-4">{% trans "Savatingiz" %}, <span class="text-muted">{{ total_quantity }} {% trans "ta
+        mahsulot" %}</span></h3>
+
+    <div class="row">
+      <!-- Chap taraf: Mahsulotlar ro'yxati -->
+      <div class="col-lg-8">
+        {% for item in cart_items %}
+        <div class="cart-box d-flex align-items-center justify-content-between flex-wrap gap-3">
+          <div class="d-flex align-items-center gap-3">
+            <img src="{{ item.product.img }}" class="cart-item-img" alt="{{ item.product.title }}">
+            <div>
+              <h6 class="mb-1 fw-bold">{{ item.product.title }}</h6>
+              <small class="text-muted">{% trans "Dona narxi" %}: ${{ item.product.price }}</small>
+            </div>
+          </div>
+
+          <!-- Plyus / Minus boshqaruvi -->
+          <div class="quantity-control">
+            <a href="{% url 'decrease_cart' item.product.id %}" class="btn-qty">-</a>
+            <span class="qty-number">{{ item.quantity }}</span>
+            <a href="{% url 'add_to_cart' item.product.id %}" class="btn-qty">+</a>
+          </div>
+
+          <!-- Jami narx va O'chirish -->
+          <div class="text-end">
+            <h5 class="fw-bold text-danger mb-1">${{ item.item_total }}</h5>
+            <a href="{% url 'remove_from_cart' item.product.id %}" class="text-secondary text-decoration-none small">
+              <i class="fa fa-trash"></i> {% trans "O'chirish" %}
+            </a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- O'ng taraf: Buyurtma xulosasi -->
+      <div class="col-lg-4">
+        <div class="cart-box">
+          <h5 class="fw-bold mb-3">{% trans "Buyurtmangiz" %}</h5>
+          <div class="d-flex justify-content-between mb-2">
+            <span>{% trans "Mahsulotlar" %} ({{ total_quantity }}):</span>
+            <strong>${{ total_price }}</strong>
+          </div>
+          <div class="d-flex justify-content-between mb-3">
+            <span>{% trans "Yetkazib berish" %}:</span>
+            <span class="text-success fw-bold">{% trans "Bepul" %}</span>
+          </div>
+          <hr>
+          <div class="d-flex justify-content-between mb-4">
+            <span class="fs-5 fw-bold">{% trans "Jami" %}:</span>
+            <span class="fs-4 fw-bold text-danger">${{ total_price }}</span>
+          </div>
+          <a href="{% url 'checkout' %}" class="btn w-100 text-white fw-bold py-2"
+            style="background-color: #f33f3f; border-radius: 8px;">
+            {% trans "Rasmiylashtirishga o'tish" %}
+          </a>
+        </div>
+      </div>
+    </div>
+
+    {% else %}
+    <div class="cart-box text-center py-5">
+      <h4>{% trans "Savatingiz hozircha bo'sh" %}</h4>
+      <p class="text-muted">{% trans "Bosh sahifadagi mahsulotlardan tanlang" %}</p>
+      <a href="{% url 'product' %}" class="btn text-white fw-bold px-4 mt-2" style="background-color: #f33f3f;">
+        {% trans "Mahsulotlarga o'tish" %}
+      </a>
+    </div>
+    {% endif %}
+
+    <!-- Pastki qism: Tavsiya etiladigan mahsulotlar -->
+    {% if recommended_products %}
+    <div class="mt-5">
+      <h4 class="fw-bold mb-3">{% trans "Sizga yoqishi mumkin bo'lgan mahsulotlar" %}</h4>
+      <div class="row">
+        {% for prod in recommended_products %}
+        <a href="{% url 'product_detail' prod.id %}">
+          <div class="col-6 col-md-3 mb-3">
+            <div class="product-recommend-card text-center">
+              <img src="{{ prod.img }}" class="recommend-img mb-2" alt="{{ prod.title }}">
+              <h6 style="color: black;" class="text-truncate fw-bold mb-1">{{ prod.title }}</h6>
+              <p class="text-danger fw-bold mb-2">${{ prod.price }}</p>
+              <a href="{% url 'add_to_cart' prod.id %}" class="btn btn-sm w-100 text-white"
+                style="background-color: #f33f3f;">
+                <i class="fa fa-shopping-cart"></i> {% trans "Savatga" %}
+              </a>
+            </div>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}{% if product %}Mahsulotni tahrirlash{% else %}Yangi mahsulot{% endif %}{% endblock %}
+{% block heading %}{% if product %}Mahsulotni tahrirlash{% else %}Yangi mahsulot{% endif %}{% endblock %}
+
+{% block content %}
+<section class="panel-card form-panel">
+    <p class="eyebrow">Katalog</p>
+    <h2>{% if product %}{{ product.title }}{% else %}Mahsulot ma’lumotlari{% endif %}</h2>
+    <form method="post" class="admin-form">
+        {% csrf_token %}
+        {% for field in form %}<label>{{ field.label }}{{ field }}{% if field.errors %}<small class="form-error">{{ field.errors|striptags }}</small>{% endif %}</label>{% endfor %}
+        <div class="form-actions"><button class="action-button approve" type="submit">Saqlash</button><a class="back-link" href="{% url 'dashboard:products' %}">Bekor qilish</a></div>
+    </form>
+</section>
+{% endblock %}

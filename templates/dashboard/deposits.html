@@ -1,0 +1,45 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Depozitlar{% endblock %}
+{% block heading %}Depozitlar{% endblock %}
+
+{% block content %}
+<section class="panel-card orders-panel">
+    <div class="toolbar">
+        <form method="get" class="filter-form">
+            <input type="search" name="q" value="{{ search }}" placeholder="Foydalanuvchi bo‘yicha qidirish">
+            <select name="status">
+                <option value="">Barcha statuslar</option>
+                <option value="pending" {% if selected_status == 'pending' %}selected{% endif %}>Kutilmoqda</option>
+                <option value="approved" {% if selected_status == 'approved' %}selected{% endif %}>Tasdiqlangan</option>
+                <option value="rejected" {% if selected_status == 'rejected' %}selected{% endif %}>Rad etilgan</option>
+            </select>
+            <button type="submit">Filtrlash</button>
+        </form>
+    </div>
+    <div class="table-wrap">
+        <table class="orders-table">
+            <thead><tr><th>Foydalanuvchi</th><th>Summa</th><th>Sana</th><th>Status</th><th>Amal</th></tr></thead>
+            <tbody>
+            {% for deposit in deposits %}
+                <tr>
+                    <td><strong>{{ deposit.user.username }}</strong><small>{{ deposit.user.email }}</small></td>
+                    <td><strong>${{ deposit.amount|floatformat:2 }}</strong></td>
+                    <td class="muted">{{ deposit.created_at|date:'d.m.Y H:i' }}</td>
+                    <td><span class="status status-{{ deposit.status }}">{{ deposit.get_status_display }}</span></td>
+                    <td>
+                        {% if deposit.status == 'pending' %}
+                            <form class="inline-actions" method="post" action="{% url 'dashboard:deposit_status' deposit.id %}">
+                                {% csrf_token %}<button class="mini-button approve" name="action" value="approve" type="submit">Tasdiqlash</button><button class="mini-button reject" name="action" value="reject" type="submit">Rad etish</button>
+                            </form>
+                        {% else %}<span class="muted">Yakunlangan</span>{% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td class="empty" colspan="5">Bu filter bo‘yicha depozit topilmadi</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

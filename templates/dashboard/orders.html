@@ -1,0 +1,41 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Buyurtmalar{% endblock %}
+{% block heading %}Buyurtmalar{% endblock %}
+
+{% block content %}
+<section class="panel-card orders-panel">
+    <div class="toolbar">
+        <form method="get" class="filter-form">
+            <input type="search" name="q" value="{{ search }}" placeholder="Mijoz yoki telefon bo‘yicha qidirish">
+            <select name="status">
+                <option value="">Barcha statuslar</option>
+                <option value="pending" {% if selected_status == 'pending' %}selected{% endif %}>Kutilmoqda</option>
+                <option value="approved" {% if selected_status == 'approved' %}selected{% endif %}>Tasdiqlangan</option>
+                <option value="rejected" {% if selected_status == 'rejected' %}selected{% endif %}>Rad etilgan</option>
+            </select>
+            <button type="submit">Filtrlash</button>
+        </form>
+    </div>
+    <div class="table-wrap">
+        <table class="orders-table">
+            <thead><tr><th>Buyurtma</th><th>Mijoz</th><th>Telefon</th><th>Summa</th><th>Sana</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+            {% for order in orders %}
+                <tr>
+                    <td><strong>#{{ order.id }}</strong></td>
+                    <td>{{ order.user.username }}</td>
+                    <td class="muted">{{ order.phone }}</td>
+                    <td><strong>${{ order.total_price|floatformat:2 }}</strong></td>
+                    <td class="muted">{{ order.created_at|date:'d.m.Y H:i' }}</td>
+                    <td><span class="status status-{{ order.status }}">{{ order.get_status_display }}</span></td>
+                    <td><a class="detail-link" href="{% url 'dashboard:order_detail' order.id %}">Ko‘rish</a></td>
+                </tr>
+            {% empty %}
+                <tr><td class="empty" colspan="7">Bu filter bo‘yicha buyurtma topilmadi</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

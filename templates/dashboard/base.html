@@ -1,0 +1,88 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin panel{% endblock %} | Abu Saxiy Center</title>
+    <link rel="stylesheet" href="{% static 'css/admin-panel.css' %}">
+    <style>
+        .dashboard-toast-container { position: fixed; top: 22px; right: 22px; z-index: 1000; width: min(360px, calc(100vw - 32px)); }
+        .dashboard-toast { margin-bottom: 12px; padding: 14px 16px; border-left: 4px solid #3d9a73; border-radius: 7px; background: #fff; box-shadow: 0 8px 25px rgba(0,0,0,.14); animation: dashboard-toast-in .25s ease-out; transition: opacity .25s ease, transform .25s ease; }
+        .dashboard-toast.is-closing { opacity: 0; transform: translateX(20px); }
+        .dashboard-toast strong { display: block; margin-bottom: 4px; }
+        .dashboard-toast p { margin: 0; color: #667085; }
+        .dashboard-toast-error, .dashboard-toast-danger { border-left-color: #dc3545; }
+        .dashboard-toast-warning { border-left-color: #cf941f; }
+        @keyframes dashboard-toast-in { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+    </style>
+</head>
+<body>
+    <div class="admin-shell">
+        <aside class="admin-sidebar">
+            <a class="brand" href="{% url 'dashboard:home' %}">
+                <span class="brand-mark">A</span>
+                <span>Abu Saxiy <strong>Center</strong></span>
+            </a>
+            <nav class="admin-nav" aria-label="Admin navigatsiyasi">
+                <a class="nav-link active" href="{% url 'dashboard:home' %}">
+                    <span class="nav-icon">⌂</span> Dashboard
+                </a>
+                <a class="nav-link" href="{% url 'dashboard:orders' %}">
+                    <span class="nav-icon">▣</span> Buyurtmalar
+                </a>
+                <a class="nav-link" href="{% url 'dashboard:deposits' %}">
+                    <span class="nav-icon">$</span> Depozitlar
+                </a>
+                <a class="nav-link" href="{% url 'dashboard:products' %}">
+                    <span class="nav-icon">◇</span> Mahsulotlar
+                </a>
+                <a class="nav-link" href="/admin/app/customuser/">
+                    <span class="nav-icon">◉</span> Foydalanuvchilar
+                </a>
+                <a class="nav-link" href="/admin/app/banner/">
+                    <span class="nav-icon">▤</span> Bannerlar
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <a class="nav-link" href="/admin/">Django admin</a>
+                <a class="nav-link" href="{% url 'home' %}">Saytga qaytish</a>
+            </div>
+        </aside>
+
+        <main class="admin-main">
+            <header class="admin-header">
+                <div>
+                    <p class="eyebrow">Boshqaruv markazi</p>
+                    <h1>{% block heading %}Dashboard{% endblock %}</h1>
+                </div>
+                <div class="admin-user">
+                    <span class="user-dot">{{ request.user.username|first|upper }}</span>
+                    <span>{{ request.user.username }}</span>
+                </div>
+            </header>
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    <div id="dashboardToastContainer" class="dashboard-toast-container" aria-live="polite"></div>
+    <script>
+        function showDashboardToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = 'dashboard-toast dashboard-toast-' + (type || 'info');
+            const title = document.createElement('strong');
+            title.textContent = 'Xabar';
+            const body = document.createElement('p');
+            body.textContent = message;
+            toast.append(title, body);
+            document.getElementById('dashboardToastContainer').appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('is-closing');
+                setTimeout(() => toast.remove(), 250);
+            }, 4500);
+        }
+        {% for message in messages %}
+        showDashboardToast("{{ message|escapejs }}", "{{ message.tags|default:'info' }}");
+        {% endfor %}
+    </script>
+</body>
+</html>

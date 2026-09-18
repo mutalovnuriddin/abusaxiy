@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+
+{% block content %}
+
+<!-- Page Content -->
+<div class="page-heading products-heading header-text">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="text-content">
+          <h4>{% trans "Yangi kelganlar" %}</h4>
+          <h2>{% trans "mahsulotlar" %}</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="products">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="product-search-panel">
+          <label for="productSearch" class="sr-only">{% trans "Mahsulot qidirish" %}</label>
+          <div class="product-search-box">
+            <i class="fa fa-search" aria-hidden="true"></i>
+            <input type="search" id="productSearch" class="product-search-input"
+              placeholder="{% trans "Mahsulot nomini qidiring..." %}" autocomplete="off">
+          </div>
+          <p id="searchStatus" class="product-search-status" aria-live="polite"></p>
+        </div>
+      </div>
+      <div class="col-md-12">
+        <div class="filters-content">
+          <div class="row grid" id="productGrid">
+            {% for product in products %}
+            <div class="col-md-4 mb-4 all des">
+              <div class="product-item h-100 d-flex flex-column">
+                <a href="{% url 'product_detail' product.id %}" class="product-img-holder">
+                  <img src="{{ product.img }}" alt="{{ product.title }}">
+                </a>
+                <div class="down-content d-flex flex-column flex-grow-1">
+                  <a href="#">
+                    <h4>{{ product.title }}</h4>
+                  </a>
+                  <h6>${{ product.price }}</h6>
+                  <p class="product-desc">{{ product.description }}</p>
+
+                  <!-- Yulduzcha va sharhlarni pastki qismga taqash uchun mt-auto -->
+                  <div class="mt-auto product-rating-row">
+                    <span class="rating-stars" style="--rating: {{ product.avg_rating|default:0 }};" aria-label="{{ product.avg_rating|default:0|floatformat:1 }} / 5">★★★★★</span>
+                    <span>{% trans "Sharhlar" %} ({{ product.views_count }})</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12" id="productPagination">
+      {% if products.has_other_pages %}
+        <ul class="pages">
+
+          <!-- Oldingi sahifaga o'tish tugmasi -->
+          {% if products.has_previous %}
+          <li><a href="?page={{ products.previous_page_number }}"><i class="fa fa-angle-double-left"></i></a></li>
+          {% endif %}
+
+          <!-- Sahifa raqamlari -->
+          {% for page_num in products.paginator.page_range %}
+          {% if products.number == page_num %}
+          <li class="active"><a href="#">{{ page_num }}</a></li>
+          {% else %}
+          <li><a href="?page={{ page_num }}">{{ page_num }}</a></li>
+          {% endif %}
+          {% endfor %}
+
+          <!-- Keyingi sahifaga o'tish tugmasi -->
+          {% if products.has_next %}
+          <li><a href="?page={{ products.next_page_number }}"><i class="fa fa-angle-double-right"></i></a></li>
+          {% endif %}
+
+        </ul>
+      {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const searchInput = document.getElementById('productSearch');
+    const productGrid = document.getElementById('productGrid');
+    const pagination = document.getElementById('productPagination');
+    const searchStatus = document.getElementById('searchStatus');
+    let searchTimer;
+    let requestController;
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>'"]/g, (character) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+      })[character]);
+    }
+
+    function productCard(product) {
+      const title = escapeHtml(product.title);
+      const description = escapeHtml(product.description);
+      const image = escapeHtml(product.img);
+
+      return `<div class="col-md-4 mb-4 all">
+        <div class="product-item h-100 d-flex flex-column">
+          <a href="/product/${product.id}/" class="product-img-holder">
+            <img src="${image}" alt="${title}">
+          </a>
+          <div class="down-content d-flex flex-column flex-grow-1">
+            <a href="/product/${product.id}/"><h4>${title}</h4></a>
+            <h6>$${escapeHtml(product.price)}</h6>
+            <p class="product-desc">${description}</p>
+            <div class="mt-auto product-rating-row">
+              <span class="rating-stars" style="--rating: ${escapeHtml(product.avg_rating)};" aria-label="${escapeHtml(Number(product.avg_rating).toFixed(1))} / 5">★★★★★</span>
+              <span>Reviews (${escapeHtml(product.views_count)})</span>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    async function searchProducts() {
+      const query = searchInput.value.trim();
+
+      if (requestController) requestController.abort();
+      requestController = new AbortController();
+      searchStatus.textContent = '{% trans "Qidirilmoqda..." %}';
+
+      try {
+        const response = await fetch(`{% url 'product_search' %}?q=${encodeURIComponent(query)}`, {
+          signal: requestController.signal
+        });
+        if (!response.ok) throw new Error('Search request failed');
+        const data = await response.json();
+        productGrid.innerHTML = data.products.length
+          ? data.products.map(productCard).join('')
+          : '<div class="col-md-12"><p class="no-products">{% trans "Mahsulot topilmadi." %}</p></div>';
+        pagination.style.display = 'none';
+        searchStatus.textContent = `${data.products.length} {% trans "ta mahsulot topildi" %}`;
+      } catch (error) {
+        if (error.name !== 'AbortError') searchStatus.textContent = '{% trans "Qidirishda xatolik yuz berdi." %}';
+      }
+    }
+
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(searchProducts, 220);
+    });
+  })();
+</script>
+
+
+{% endblock %}

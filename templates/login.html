@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load socialaccount i18n %}
+
+<style>
+  .auth-section {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 15px;
+    background-color: #f8f9fa;
+  }
+
+  .auth-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+    border-top: 4px solid #f33f3f;
+  }
+
+  .auth-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #212529;
+    text-align: center;
+    margin-bottom: 25px;
+  }
+
+  .auth-card p {
+    margin-bottom: 18px;
+  }
+
+  .auth-card label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #495057;
+    font-size: 14px;
+  }
+
+  .auth-card input[type="text"],
+  .auth-card input[type="password"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    outline: none;
+  }
+
+  .auth-card input:focus {
+    border-color: #f33f3f;
+    box-shadow: 0 0 0 3px rgba(243, 63, 63, 0.15);
+  }
+
+  .btn-auth-submit {
+    width: 100%;
+    background-color: #f33f3f;
+    color: #ffffff;
+    border: none;
+    padding: 13px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+  }
+
+  .btn-auth-submit:hover {
+    background-color: #d93333;
+  }
+
+  .auth-footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #6c757d;
+  }
+
+  .auth-footer a {
+    color: #f33f3f;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .auth-footer a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+<div class="auth-section">
+  <div class="auth-card">
+    <h2 class="auth-title">{% trans "Tizimga kirish" %}</h2>
+
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn-auth-submit">{% trans "Kirish" %}</button>
+    </form>
+
+    <div class="auth-footer">
+      {% trans "Akkauntingiz yo'qmi?" %} <a href="{% url 'register' %}">{% trans "Ro'yxatdan o'tish" %}</a>
+    </div>
+    <div class="my-3 text-center">
+      <form method="post" action="{% provider_login_url 'google' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-danger w-100 fw-bold py-2" style="border-radius: 8px;">
+          <i class="fa-brands fa-google"></i> {% trans "Google orqali kirish" %}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

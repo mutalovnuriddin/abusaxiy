@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load i18n %}
+
+<style>
+  .profile-section {
+    padding: 100px 0 60px 0;
+    background-color: #f8f9fa;
+    min-height: 85vh;
+  }
+
+  .profile-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    padding: 30px;
+    margin-bottom: 30px;
+    border-top: 4px solid #f33f3f;
+  }
+
+  .avatar-box {
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 20px auto;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #f33f3f;
+    box-shadow: 0 4px 10px rgba(243, 63, 63, 0.2);
+  }
+
+  .avatar-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .profile-name {
+    font-size: 24px;
+    font-weight: 700;
+    color: #212529;
+    text-align: center;
+    margin-bottom: 5px;
+  }
+
+  .profile-email {
+    font-size: 14px;
+    color: #6c757d;
+    text-align: center;
+    margin-bottom: 25px;
+  }
+
+  .form-group label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 6px;
+    font-size: 14px;
+  }
+
+  .form-control-custom {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    outline: none;
+    transition: all 0.3s ease;
+  }
+
+  .form-control-custom:focus {
+    border-color: #f33f3f;
+    box-shadow: 0 0 0 3px rgba(243, 63, 63, 0.15);
+  }
+
+  .btn-save-profile {
+    background-color: #f33f3f;
+    color: #ffffff;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .btn-save-profile:hover {
+    background-color: #d93333;
+  }
+</style>
+
+<div class="profile-section">
+  <div class="container">
+    <div class="row">
+
+      <!-- Chap taraf: Profil, Hamyon va Buyurtmalar Tarixi -->
+      <div class="col-md-4">
+
+        <!-- User kartochkasi -->
+        <div class="profile-card text-center">
+          <div class="avatar-box">
+            {% if user.avatar %}
+            <img src="{{ user.avatar.url }}" alt="{{ user.username }}">
+            {% else %}
+            <img src="/media/avatars/user.png" alt="{{ user.username }}">
+            {% endif %}
+          </div>
+          <h3 class="profile-name">{{ user.username }}</h3>
+          <p class="profile-email">{{ user.email|default:_("Email kiritilmagan") }}</p>
+          <hr>
+          <div class="text-left mt-3">
+            <p><strong>{% trans "Telefon" %}:</strong> {{ user.phone_number|default:_("Kiritilmagan") }}</p>
+            <p><strong>{% trans "Tug'ilgan sana" %}:</strong> {{ user.birth_date|default:_("Kiritilmagan") }}</p>
+          </div>
+        </div>
+
+        <!-- Buyurtmalar Tarixi -->
+        <div class="profile-card" style="border-top: 4px solid #17a2b8;">
+          <h5 class="fw-bold mb-3 text-center">{% trans "Xaridlar Tarixi" %}</h5>
+          {% if orders %}
+          <div style="max-height: 400px; overflow-y: auto;">
+            {% for order in orders %}
+            <div class="p-2 mb-2 rounded border" style="background-color: #fcfcfc;">
+              <div class="d-flex justify-content-between align-items-center">
+                <strong>ID: #{{ order.id }}</strong>
+                <span class="badge 
+                    {% if order.status == 'pending' %}bg-warning text-dark
+                    {% elif order.status == 'approved' %}bg-success
+                    {% else %}bg-danger{% endif %}">
+                  {{ order.get_status_display }}
+                </span>
+              </div>
+              <div class="small text-muted mt-1">
+                {% trans "Summa" %}: <strong class="text-danger">${{ order.total_price }}</strong><br>
+                {% trans "Sana" %}: {{ order.created_at|date:"d.m.Y H:i" }}
+              </div>
+              <ul class="pl-3 mt-2 mb-0 small">
+                {% for item in order.items.all %}
+                <li>{{ item.product.title }} ({{ item.quantity }} {% trans "ta" %})</li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <p class="text-muted text-center small mb-0">{% trans "Hozircha xaridlar mavjud emas." %}</p>
+          {% endif %}
+        </div>
+
+      </div>
+
+      <!-- O'ng taraf: Ma'lumotlarni tahrirlash formasi -->
+      <div class="col-md-8">
+        <div class="profile-card">
+          <h4 class="mb-4" style="font-weight: 700; color: #333;">{% trans "Profil ma'lumotlarini tahrirlash" %}</h4>
+
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-md-6 mb-3 form-group">
+                <label>{% trans "Foydalanuvchi nomi" %}</label>
+                <input type="text" name="username" value="{{ form.username.value|default:'' }}"
+                  class="form-control-custom" required>
+              </div>
+
+              <div class="col-md-6 mb-3 form-group">
+                <label>{% trans "Email manzil" %}</label>
+                <input type="email" name="email" value="{{ form.email.value|default:'' }}" class="form-control-custom">
+              </div>
+
+              <div class="col-md-6 mb-3 form-group">
+                <label>{% trans "Telefon raqam" %}</label>
+                <input type="text" name="phone_number" value="{{ form.phone_number.value|default:'' }}"
+                  class="form-control-custom" placeholder="+998901234567">
+              </div>
+
+              <div class="col-md-6 mb-3 form-group">
+                <label>{% trans "Tug'ilgan sana" %}</label>
+                <input type="date" name="birth_date" value="{{ user.birth_date|date:'Y-m-d' }}"
+                  class="form-control-custom">
+              </div>
+
+              <div class="col-md-12 mb-4 form-group">
+                <label>{% trans "Rasm (Avatar)" %}</label>
+                <input type="file" name="avatar" class="form-control-custom">
+              </div>
+            </div>
+
+            <button type="submit" class="btn-save-profile">
+              <i class="fa fa-save"></i> {% trans "O'zgarishlarni saqlash" %}
+            </button>
+          </form>
+        </div>
+
+        <!-- Karta va Balans bloki -->
+        <div class="profile-card text-center" style="border-top: 4px solid #28a745;">
+          <h5 class="fw-bold">{% trans "Mening Hamyonim" %}</h5>
+          {% if user.card %}
+          <div class="p-3 my-2 text-white rounded" style="background: linear-gradient(135deg, #1e3c72, #2a5298);">
+            <p style="color: white; font-weight: 700; font-size: 18px;" class="mb-1">{% trans "Karta raqami" %}</p>
+            <h6 style="font-size: 20px;" class="fw-bold">{{ user.card.card_number }}</h6>
+            <hr style="border-color: rgba(255,255,255,0.2);">
+            <p style="color: white; font-weight: 700; font-size: 20px;" class="mb-0">{% trans "Balans" %}: <strong class="fs-5">${{ user.card.balance }}</strong></p>
+          </div>
+
+          <form action="{% url 'deposit' %}" method="post" class="mt-3">
+            {% csrf_token %}
+            <div class="input-group mb-2">
+              <input type="number" step="0.01" name="amount" class="form-control-custom" placeholder="{% trans 'Summa ($)' %}"
+                required>
+              <button class="btn btn-success" type="submit">{% trans "To'ldirish" %}</button>
+            </div>
+          </form>
+          {% else %}
+          <p class="text-muted small">{% trans "Sizda hali karta qo'shilmagan." %}</p>
+          <form action="{% url 'add_card' %}" method="post">
+            {% csrf_token %}
+            <input type="text" name="card_number" maxlength="16" class="form-control-custom mb-2"
+              placeholder="8600 0000 0000 0000" required>
+            <button class="btn-save-profile w-100" type="submit">{% trans "Karta qo'shish" %}</button>
+          </form>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

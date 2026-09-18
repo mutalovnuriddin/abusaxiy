@@ -1,0 +1,103 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<section class="metric-grid">
+    <article class="metric-card accent-red">
+        <div class="metric-label">Faol mijozlar</div>
+        <div class="metric-value">{{ user_count }}</div>
+        <div class="metric-note">Ro‘yxatdan o‘tgan foydalanuvchilar</div>
+    </article>
+    <article class="metric-card accent-blue">
+        <div class="metric-label">Buyurtmalar</div>
+        <div class="metric-value">{{ order_count }}</div>
+        <div class="metric-note"><strong>{{ pending_order_count }}</strong> tasi ko‘rib chiqilmoqda</div>
+    </article>
+    <article class="metric-card accent-amber">
+        <div class="metric-label">Depozit so‘rovlari</div>
+        <div class="metric-value">{{ pending_deposit_count }}</div>
+        <div class="metric-note">Tasdiqlashni kutmoqda</div>
+    </article>
+    <article class="metric-card accent-green">
+        <div class="metric-label">Mahsulotlar</div>
+        <div class="metric-value">{{ product_count }}</div>
+        <div class="metric-note">Katalogdagi mahsulotlar</div>
+    </article>
+</section>
+
+<section class="summary-row">
+    <div class="summary-card">
+        <span>Tasdiqlangan buyurtmalar</span>
+        <strong>${{ approved_order_total|floatformat:2 }}</strong>
+    </div>
+    <div class="summary-card">
+        <span>Tasdiqlangan depozitlar</span>
+        <strong>${{ approved_deposit_total|floatformat:2 }}</strong>
+    </div>
+</section>
+
+<section class="content-grid">
+    <div class="panel-card">
+        <div class="panel-heading">
+            <div>
+                <p class="eyebrow">Operatsiyalar</p>
+                <h2>So‘nggi buyurtmalar</h2>
+            </div>
+            <a href="{% url 'dashboard:orders' %}">Barchasi</a>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>#</th><th>Mijoz</th><th>Summa</th><th>Status</th></tr></thead>
+                <tbody>
+                {% for order in recent_orders %}
+                    <tr>
+                        <td class="muted">#{{ order.id }}</td>
+                        <td><strong>{{ order.user.username }}</strong><small>{{ order.created_at|date:'d.m.Y H:i' }}</small></td>
+                        <td>${{ order.total_price|floatformat:2 }}</td>
+                        <td><span class="status status-{{ order.status }}">{{ order.get_status_display }}</span></td>
+                    </tr>
+                {% empty %}
+                    <tr><td class="empty" colspan="4">Hozircha buyurtmalar mavjud emas</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="panel-card">
+        <div class="panel-heading">
+            <div>
+                <p class="eyebrow">Moliya</p>
+                <h2>Depozitlar</h2>
+            </div>
+            <a href="{% url 'dashboard:deposits' %}">Barchasi</a>
+        </div>
+        <div class="deposit-list">
+            {% for deposit in recent_deposits %}
+                <div class="deposit-item">
+                    <div class="avatar">{{ deposit.user.username|first|upper }}</div>
+                    <div class="deposit-info"><strong>{{ deposit.user.username }}</strong><small>{{ deposit.created_at|date:'d.m.Y H:i' }}</small></div>
+                    <div class="deposit-amount">${{ deposit.amount|floatformat:2 }}<span class="status status-{{ deposit.status }}">{{ deposit.get_status_display }}</span></div>
+                </div>
+            {% empty %}
+                <p class="empty">Hozircha depozitlar mavjud emas</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="panel-card popular-panel">
+    <div class="panel-heading">
+        <div><p class="eyebrow">Katalog</p><h2>Ko‘p ko‘rilgan mahsulotlar</h2></div>
+        <a href="{% url 'dashboard:products' %}">Mahsulotlar</a>
+    </div>
+    <div class="product-list">
+        {% for product in popular_products %}
+            <div class="product-row"><strong>{{ forloop.counter }}</strong><span>{{ product.title }}</span><small>{{ product.views_count }} ko‘rish</small><b>${{ product.price|floatformat:2 }}</b></div>
+        {% empty %}
+            <p class="empty">Hozircha mahsulotlar mavjud emas</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

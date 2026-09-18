@@ -1,0 +1,21 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Mahsulotlar{% endblock %}
+{% block heading %}Mahsulotlar{% endblock %}
+
+{% block content %}
+<section class="panel-card orders-panel">
+    <div class="toolbar product-toolbar">
+        <form method="get" class="filter-form"><input type="search" name="q" value="{{ search }}" placeholder="Mahsulot nomi bo‘yicha qidirish"><button type="submit">Qidirish</button></form>
+        <a class="primary-link" href="{% url 'dashboard:product_new' %}">+ Mahsulot qo‘shish</a>
+    </div>
+    <div class="product-admin-grid">
+        {% for product in products %}
+            <article class="product-admin-card">
+                <div class="product-image"><img src="{{ product.img }}" alt="{{ product.title }}"></div>
+                <div class="product-admin-content"><p class="eyebrow">{{ product.views_count }} ko‘rish</p><h2>{{ product.title }}</h2><strong>${{ product.price|floatformat:2 }}</strong><p>{{ product.description|truncatechars:100 }}</p><div class="card-actions"><a href="{% url 'dashboard:product_edit' product.id %}">Tahrirlash</a><form method="post" action="{% url 'dashboard:product_delete' product.id %}">{% csrf_token %}<button type="submit">O‘chirish</button></form></div></div>
+            </article>
+        {% empty %}<p class="empty">Mahsulot topilmadi</p>{% endfor %}
+    </div>
+</section>
+{% endblock %}

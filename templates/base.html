@@ -1,0 +1,413 @@
+{% load static i18n %}
+
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css"
+        integrity="sha512-QeR2VH+lsBE5LSAe1Q5EnTBbe7XTBubt8dG93Y7gidSgdMCr8nVqKcfKAMyN96SV8KDbZVTDXChatu5G2KQGzg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer">
+
+    <title>{% trans "Abu Saxiy Center" %}</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Additional CSS Files -->
+    <link rel="stylesheet" href="{% static 'css/fontawesome.css' %}">
+    <link rel="stylesheet" href="{% static 'css/templatemo-sixteen.css' %}">
+    <link rel="stylesheet" href="{% static 'css/owl.css' %}">
+
+    <style>
+        .lang-switcher {
+            position: relative;
+            display: inline-block;
+        }
+
+        .lang-switcher-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+        }
+
+        .lang-switcher-btn:hover {
+            border-color: #f33f3f;
+            background: rgba(243, 63, 63, 0.1);
+        }
+
+        .lang-switcher-btn i {
+            font-size: 11px;
+        }
+
+        .lang-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 4px;
+            background: #fff;
+            border-radius: 6px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            min-width: 140px;
+            z-index: 99999;
+            overflow: hidden;
+        }
+
+        .lang-dropdown.show {
+            display: block;
+        }
+
+        .lang-dropdown form {
+            margin: 0;
+        }
+
+        .lang-dropdown button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 10px 14px;
+            border: none;
+            background: transparent;
+            color: #333;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: left;
+            transition: background 0.2s;
+        }
+
+        .lang-dropdown button:hover {
+            background: #f8f9fa;
+            color: #f33f3f;
+        }
+
+        .lang-dropdown button.active-lang {
+            color: #f33f3f;
+            font-weight: 700;
+            background: #fff5f5;
+        }
+
+        .lang-dropdown .lang-flag {
+            font-size: 16px;
+            line-height: 1;
+        }
+
+        .background-header .lang-switcher-btn {
+            color: #1e1e1e;
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        .background-header .lang-switcher-btn:hover {
+            border-color: #f33f3f;
+        }
+
+        /* Kartochkalarning balandligini bir xil qilish */
+        .product-item {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        /* Rasm sig'adigan blok o'lchami */
+        .product-img-holder {
+            width: 100%;
+            height: 230px;
+            /* Rasmlarning standart balandligi */
+            overflow: hidden;
+            display: block;
+            background-color: #f7f7f7;
+        }
+
+        /* Rasm va uning moslashuvchanligi */
+        .product-img-holder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* Rasmni buzmasdan, ramkaga moslab qirqadi */
+            object-position: center;
+        }
+
+        /* Kontent qismi va yulduzchalarni pastga taqash */
+        .down-content {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        /* Tavsif matni ko'p bo'lsa 3 qatorda cheklash (...) */
+        .product-description {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        /* Yulduzchalar va sharhlarni eng pastga taqash */
+        .product-bottom-info {
+            margin-top: auto;
+        }
+    </style>
+</head>
+<!-- HTML va Tayyor CSS -->
+
+
+<body>
+
+    <!-- ***** Preloader Start ***** -->
+    <div id="preloader">
+        <div class="jumper">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+    <!-- ***** Preloader End ***** -->
+
+    <!-- Header -->
+    <header class="site-header">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container">
+                <a class="navbar-brand" href="{% url 'home' %}">
+                    <h2>Abu saxiy <em>Center</em></h2>
+                </a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
+                    aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarResponsive">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                            <a class="nav-link" href="{% url 'home' %}">{% trans "Bosh sahifa" %}
+                                {% if request.resolver_match.url_name == 'home' %}
+                                <span class="sr-only">{% trans "(current)" %}</span>
+                                {% endif %}
+                            </a>
+                        </li>
+                        <li class="nav-item {% if request.resolver_match.url_name == 'product' %}active{% endif %}">
+                            <a class="nav-link" href="{% url 'product' %}">{% trans "Mahsulotlar" %}</a>
+                        </li>
+                        <li class="nav-item {% if request.resolver_match.url_name == 'about' %}active{% endif %}">
+                            <a class="nav-link" href="{% url 'about' %}">{% trans "Biz haqimizda" %}</a>
+                        </li>
+                        <li class="nav-item {% if request.resolver_match.url_name == 'contact' %}active{% endif %}">
+                            <a class="nav-link" href="{% url 'contact' %}">{% trans "Aloqa" %}</a>
+                        </li>
+
+                        <!-- Autentifikatsiya qismi -->
+                        {% if user.is_authenticated %}
+                        <!-- Foydalanuvchi tizimga kirgan bo'lsa -->
+                        <li class="nav-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+                            <a class="nav-link" href="{% url 'profile' user.id %}">{{ user.username }}</a>
+
+                        </li>
+                        <li class="nav-item {% if request.resolver_match.url_name == 'cart' %}active{% endif %}">
+                            {% if cart_count > 0 %}
+                            <a class="nav-link cart-link" href="{% url 'cart' %}">{% trans "Savat" %} <span
+                                    class="cart-badge">{{ cart_count }}</span></a>
+                            {% else %}
+                            <a class="nav-link" href="{% url 'cart' %}">{% trans "Savat" %}</a>
+                            {% endif %}
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}">
+                                <i class="fa fa-sign-out-alt"></i> {% trans "Chiqish" %}
+                            </a>
+                        </li>
+                        {% else %}
+                        <!-- Foydalanuvchi tizimga kirmagan bo'lsa -->
+                        <li class="nav-item {% if request.resolver_match.url_name == 'login' %}active{% endif %}">
+                            <a class="nav-link" href="{% url 'login' %}">{% trans "Kirish" %}</a>
+                        </li>
+                        <li class="nav-item {% if request.resolver_match.url_name == 'register' %}active{% endif %}">
+                            <a class="nav-link" href="{% url 'register' %}">{% trans "Ro'yxatdan o'tish" %}</a>
+                        </li>
+                        {% endif %}
+
+                        <!-- Til almashtirgich -->
+                        <li class="nav-item lang-item">
+                            <div class="lang-switcher">
+                                <button class="lang-switcher-btn"
+                                    onclick="document.querySelector('.lang-dropdown').classList.toggle('show')">
+                                    {% if LANGUAGE_CODE == 'uz' %}🇺🇿 UZ
+                                    {% elif LANGUAGE_CODE == 'ru' %}🇷🇺 RU
+                                    {% else %}🇬🇧 EN{% endif %}
+                                    <i class="fa fa-chevron-down"></i>
+                                </button>
+                                <div class="lang-dropdown">
+                                    <form action="{% url 'set_language' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                        <button type="submit" name="language" value="uz"
+                                            class="{% if LANGUAGE_CODE == 'uz' %}active-lang{% endif %}">
+                                            <span class="lang-flag">🇺🇿</span> O'zbek
+                                        </button>
+                                    </form>
+                                    <form action="{% url 'set_language' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                        <button type="submit" name="language" value="ru"
+                                            class="{% if LANGUAGE_CODE == 'ru' %}active-lang{% endif %}">
+                                            <span class="lang-flag">🇷🇺</span> Русский
+                                        </button>
+                                    </form>
+                                    <form action="{% url 'set_language' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                        <button type="submit" name="language" value="en"
+                                            class="{% if LANGUAGE_CODE == 'en' %}active-lang{% endif %}">
+                                            <span class="lang-flag">🇬🇧</span> English
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    {% block content %}
+
+
+    {% endblock %}
+
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="inner-content">
+                        <p>{% trans "Mualliflik huquqi" %} &copy; 2026 Abu saxiy Center
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+
+    <!-- Additional Scripts -->
+    <script src="{% static 'js/custom.js' %}"></script>
+    <script src="{% static 'js/owl.js' %}"></script>
+    <script src="{% static 'js/slick.js' %}"></script>
+    <script src="{% static 'js/isotope.js' %}"></script>
+    <script src="{% static 'js/accordions.js' %}"></script>
+
+
+    <script language="text/Javascript">
+        cleared[0] = cleared[1] = cleared[2] = 0; //set a cleared flag for each field
+        function clearField(t) {                   //declaring the array outside of the
+            if (!cleared[t.id]) {                      // function makes it static and global
+                cleared[t.id] = 1;  // you could use true and false, but that's more typing
+                t.value = '';         // with more chance of typos
+                t.style.color = '#fff';
+            }
+        }
+    </script>
+
+    <!-- Notification Audio mp3 linki -->
+    <audio id="notifAudio" src="{% static 'audio/apple-pay-sound.mp3' %}" preload="auto"></audio>
+
+    <!-- Toast Pop-up oynasi -->
+    <div id="toastContainer" class="notification-container" aria-live="polite" aria-atomic="true"></div>
+
+    <script>
+        function fetchNotifications() {
+            fetch("{% url 'check_notifications' %}")
+                .then(response => response.json())
+                .then(data => {
+                    if (data.notifications && data.notifications.length > 0) {
+
+                        // 1. Apple Pay Ovozini ijro etish
+                        var audio = document.getElementById("notifAudio");
+                        audio.currentTime = 0;
+                        audio.play().catch(function (error) {
+                            console.log("Audio ijro cheklovi (Autoplay policy):", error);
+                        });
+
+                        // 2. Bildirishnomani ekranga chiqarish
+                        data.notifications.forEach(notif => {
+                            showToast(notif.title, notif.message, "success");
+                        });
+
+                    }
+                })
+                .catch(err => console.error("Notification error:", err));
+        }
+
+        function showToast(title, message, type) {
+            var toast = document.createElement("div");
+            toast.className = "site-notification site-notification-" + (type || "info");
+            toast.setAttribute("role", "alert");
+
+            var header = document.createElement("div");
+            header.className = "site-notification-header";
+            var heading = document.createElement("strong");
+            heading.textContent = title;
+            var close = document.createElement("button");
+            close.type = "button";
+            close.className = "site-notification-close";
+            close.setAttribute("aria-label", "{% trans "Yopish" %}");
+            close.innerHTML = "&times;";
+            header.append(heading, close);
+
+            var body = document.createElement("div");
+            body.className = "site-notification-body";
+            body.textContent = message;
+            toast.append(header, body);
+            document.getElementById("toastContainer").appendChild(toast);
+
+            close.addEventListener("click", function () { toast.remove(); });
+            setTimeout(function () {
+                toast.classList.add("is-closing");
+                setTimeout(function () { toast.remove(); }, 250);
+            }, 4500);
+        }
+
+        {% for message in messages %}
+        showToast("{% trans "Xabar" %}", "{{ message|escapejs }}", "{{ message.tags|default:'info' }}");
+        {% endfor %}
+
+        // Har 5 soniyada yangi bildirishnomalarni tekshirish
+        setInterval(fetchNotifications, 5000);
+
+        // Tashqi dropdownlarni yopish
+        document.addEventListener('click', function (e) {
+            var switcher = document.querySelector('.lang-switcher');
+            if (switcher && !switcher.contains(e.target)) {
+                var dropdown = switcher.querySelector('.lang-dropdown');
+                if (dropdown) dropdown.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+
+</html>
